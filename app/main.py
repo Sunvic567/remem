@@ -9,7 +9,7 @@ from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 
-from app.api.routes import memories, admin, health, webhooks
+from app.api.routes import memories, admin, health, webhooks, benchmark
 from app.core.config import get_settings
 
 settings = get_settings()
@@ -30,7 +30,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="Remem - Memory-as-a-Service",
-    description="Persistent memory API for AI agents. One key. Five endpoints.",
+    description="Persistent memory API for AI agents. One key. Thirteen endpoints.",
     version="1.0.0",
     lifespan=lifespan,
 )
@@ -50,6 +50,7 @@ app.include_router(memories.router)
 app.include_router(admin.router)
 app.include_router(health.router)
 app.include_router(webhooks.router)
+app.include_router(benchmark.router)
 
 
 @app.exception_handler(Exception)

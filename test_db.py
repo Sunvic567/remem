@@ -293,5 +293,4 @@ print(f"  Results: {len(results.memories)}")
 assert len(results.memories) == 0, "Expected 0 results after wipe"
 
 print("\n✅ All tests passed.")
-
-test_userApi = "maas_E_lhk7BHJ8HpLth7h2MxX2UW0pepJeYnivlU6KRsC0o"
+

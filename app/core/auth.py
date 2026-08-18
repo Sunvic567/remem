@@ -57,8 +57,9 @@ async def get_current_tenant(
 
 def get_master_key(api_key: str = Security(api_key_header)) -> bool:
     """Used by admin endpoints only."""
+    import secrets
     from app.core.config import Settings
-    if api_key != Settings().MAAS_MASTER_KEY:
+    if not secrets.compare_digest(api_key, Settings().MAAS_MASTER_KEY):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Master key required.",

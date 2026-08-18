@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 from typing import Optional, Literal, Any
 from datetime import datetime
 #import uuid
@@ -35,6 +35,20 @@ class MemorySearch(BaseModel):
     top_k: int = Field(default=5, ge=1, le=20)
     min_score: float = Field(default=0.70, ge=0.0, le=1.0)
     memory_type: Optional[MemoryType] = None
+    similarity_weight: Optional[float] = Field(default=None, ge=0.0, le=1.0)
+    recency_weight: Optional[float] = Field(default=None, ge=0.0, le=1.0)
+    importance_weight: Optional[float] = Field(default=None, ge=0.0, le=1.0)
+
+    @model_validator(mode="after")
+    def validate_weights(self) -> "MemorySearch":
+        weights = [self.similarity_weight, self.recency_weight, self.importance_weight]
+        if any(w is not None for w in weights):
+            if any(w is None for w in weights):
+                raise ValueError("If any search weight is specified, all weights (similarity_weight, recency_weight, importance_weight) must be specified.")
+            total = sum(weights)
+            if not (0.99 <= total <= 1.01):
+                raise ValueError(f"The sum of similarity_weight, recency_weight, and importance_weight must equal 1.0 (got {total})")
+        return self
 
 
 class MemoryList(BaseModel):
@@ -57,7 +71,7 @@ class Is_Duplicate(BaseModel):
 class MemoryUpdate(BaseModel):
     user_id: str
     agent_id: str
-    memory_id: str
+    memory_id: Optional[str] = None
     new_content: Optional[str] = Field(None, min_length=1, max_length=10_000)
     metadata: Optional[dict[str, Any]] = None
     importance: Optional[float] = Field(None, ge=0.0, le=1.0)
@@ -130,7 +144,15 @@ class TenantCreate(BaseModel):
 
     # Direct Postgres connection string (used for setup only)
     byod_db_connection_string: Optional[str] = None
-   
+
+    @model_validator(mode="after")
+    def validate_byod_credentials(self) -> "TenantCreate":
+        if self.mode == "byod":
+            if not self.byod_supabase_url or not self.byod_supabase_url.strip():
+                raise ValueError("byod_supabase_url is required when mode is 'byod'")
+            if not self.byod_supabase_key or not self.byod_supabase_key.strip():
+                raise ValueError("byod_supabase_key is required when mode is 'byod'")
+        return self
 
 
 class TenantOut(BaseModel):

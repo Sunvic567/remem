@@ -26,6 +26,11 @@ class Settings:
     # App environment
     app_env = os.getenv("ENVIRONMENT", "development")
 
+    # Default Hybrid Search Weights
+    DEFAULT_SIMILARITY_WEIGHT = float(os.getenv("DEFAULT_SIMILARITY_WEIGHT", "0.70"))
+    DEFAULT_RECENCY_WEIGHT    = float(os.getenv("DEFAULT_RECENCY_WEIGHT", "0.20"))
+    DEFAULT_IMPORTANCE_WEIGHT = float(os.getenv("DEFAULT_IMPORTANCE_WEIGHT", "0.10"))
+
 
 @lru_cache
 def get_settings() -> Settings:

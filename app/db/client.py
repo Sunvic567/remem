@@ -11,6 +11,12 @@ def get_master_client() -> Client:
     return settings.supabase
 
 
+@lru_cache(maxsize=128)
+def _create_byod_client(url: str, key: str) -> Client:
+    """Creates and caches Supabase Client for a BYOD connection pool."""
+    return create_client(url, key)
+
+
 def get_tenant_client(tenant: dict) -> Client:
     """
     Returns the correct Supabase client for this tenant.
@@ -19,7 +25,7 @@ def get_tenant_client(tenant: dict) -> Client:
     - BYOD mode: returns client pointed at tenant's own Supabase instance
     """
     if tenant.get("mode") == "byod":
-        return create_client(
+        return _create_byod_client(
             tenant["byod_supabase_url"],
             tenant["byod_supabase_key"],
         )

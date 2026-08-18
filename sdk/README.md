@@ -21,7 +21,7 @@ pip install Remem-py
 ```python
 from remem import RememClient
 
-client = RememClient(api_key="remem_live_xxx")
+client = RememClient(api_key="rm_xxxxxxxxxxxxxx")
 
 # Store a memory
 result = client.remember(
@@ -51,7 +51,7 @@ Use `AsyncRememClient` for async apps and frameworks like FastAPI or LangGraph:
 ```python
 from remem import AsyncRememClient
 
-async with AsyncRememClient(api_key="remem_live_xxx") as client:
+async with AsyncRememClient(api_key="rm_xxxxxxxxxxxxxx") as client:
     await client.remember(
         "User prefers concise responses",
         user_id="user_123",
@@ -86,7 +86,7 @@ async with AsyncRememClient(api_key="remem_live_xxx") as client:
 
 ```python
 client = RememClient(
-    api_key="remem_live_xxx",   # required
+    api_key="rm_xxxxxxxxxxxxxx",   # required
     base_url="https://api.remem.online",  # default
     timeout=30.0,               # seconds
 )
@@ -106,7 +106,7 @@ from remem import (
     RememError,
 )
 
-client = RememClient(api_key="remem_live_xxx")
+client = RememClient(api_key="rm_xxxxxxxxxxxxxx")
 
 try:
     result = client.remember(
@@ -137,11 +137,11 @@ except RememError as e:
 
 ```python
 # Sync
-with RememClient(api_key="remem_live_xxx") as client:
+with RememClient(api_key="rm_xxxxxxxxxxxxxx") as client:
     client.remember("User is in Lagos", user_id="u1", agent_id="bot")
 
 # Async
-async with AsyncRememClient(api_key="remem_live_xxx") as client:
+async with AsyncRememClient(api_key="rm_xxxxxxxxxxxxxx") as client:
     await client.remember("User is in Lagos", user_id="u1", agent_id="bot")
 ```
 
@@ -153,7 +153,7 @@ async with AsyncRememClient(api_key="remem_live_xxx") as client:
 from langgraph.graph import StateGraph, MessagesState
 from remem import AsyncRememClient
 
-remem = AsyncRememClient(api_key="remem_live_xxx")
+remem = AsyncRememClient(api_key="rm_xxxxxxxxxxxxxx")
 
 
 async def load_memory(state: MessagesState):
@@ -215,17 +215,17 @@ Every method maps to a REST endpoint:
 ```bash
 # Store
 curl -X POST https://api.remem.online/memories \
-  -H "X-API-Key: remem_live_xxx" \
+  -H "X-API-Key: rm_xxxxxxxxxxxxxx" \
   -H "Content-Type: application/json" \
   -d '{"content": "User prefers dark mode", "user_id": "u1", "agent_id": "bot"}'
 
 # Search
 curl "https://api.remem.online/memories/search?query=preferences&user_id=u1&agent_id=bot" \
-  -H "X-API-Key: remem_live_xxx"
+  -H "X-API-Key: rm_xxxxxxxxxxxxxx"
 
 # Context
 curl "https://api.remem.online/memories/context?user_id=u1&agent_id=bot" \
-  -H "X-API-Key: remem_live_xxx"
+  -H "X-API-Key: rm_xxxxxxxxxxxxxx"
 ```
 
 Full API reference at [remem.online/docs](https://remem.online/docs).

@@ -19,6 +19,7 @@ dependencies = [
     "remem-py>=0.1.4",
     "langchain>=1.3.12",
     "langchain-google-genai>=4.2.7",
+    "huggingface-hub>=0.20.0",
 ]
 
  

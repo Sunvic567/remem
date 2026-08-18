@@ -54,11 +54,10 @@ async def flutterwave_webhook(
     Flutterwave calls this after every payment event.
     Handles: successful payment, subscription renewal, failed payment.
     """
-    # Step 1 — Verify the request is actually from Flutterwave
     secret_hash = settings.FLUTTERWAVE_SECRET_HASH
     signature   = request.headers.get("verif-hash")
 
-    if not signature or signature != secret_hash:
+    if not signature or not secrets.compare_digest(signature, secret_hash):
         raise HTTPException(status_code=401, detail="Invalid webhook signature")
 
     payload = await request.json()
@@ -157,7 +156,14 @@ async def _create_tenant_and_notify(
                 "is_suspended": False,
             }).execute()
         )
-        tenant_rows = cast(list[dict[str, Any]], tenant_result.data or [])
+        if not tenant_result or not getattr(tenant_result, "data", None):
+            logger.error("Failed to create tenant record for %s — no data returned", email)
+            return
+
+        tenant_rows = cast(list[dict[str, Any]], tenant_result.data)
+        if not tenant_rows:
+            logger.error("Failed to create tenant record for %s — data empty", email)
+            return
         tenant_id = tenant_rows[0]["tenant_id"]
 
         # Insert API key

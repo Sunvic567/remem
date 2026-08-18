@@ -163,15 +163,21 @@ APP_ENV=development
 
 ## API Reference
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/memories` | POST | Store a memory |
-| `/memories/search` | POST | Semantic search |
-| `/memories/context` | POST | Get ranked context |
-| `/memories/{id}` | DELETE | Delete a memory |
-| `/memories/wipe` | DELETE | Clear all memories |
-| `/benchmark` | GET | AMD latency metrics |
-| `/health` | GET | Health check |
+| Endpoint | Method | Auth | Description |
+|----------|--------|------|-------------|
+| `/memories` | POST | API key | Store a memory |
+| `/memories/search` | GET | API key | Semantic search — hybrid scored results |
+| `/memories/context` | GET | API key | Get ranked context for a user+agent pair |
+| `/memories` | GET | API key | List all memories (paginated) |
+| `/memories/{id}` | PATCH | API key | Update an existing memory's content/importance |
+| `/memories/duplicate-check` | POST | API key | Check if a memory already exists |
+| `/memories/{id}` | DELETE | API key | Delete a single memory |
+| `/memories` | DELETE | API key | Wipe all memories for a user+agent (`confirm=true` required) |
+| `/benchmark` | GET | — | AMD Instinct MI300X embedding latency metrics |
+| `/health` | GET | — | System health check |
+| `/webhooks/signup/free` | POST | — | Free plan signup (creates tenant, emails key) |
+| `/webhooks/flutterwave` | POST | Signature | Flutterwave payment webhook |
+| `/admin/tenants` | POST | Master key | Create a tenant (internal use) |
 
 Full docs: https://dev.remem.online/docs
 

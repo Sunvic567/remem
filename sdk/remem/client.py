@@ -9,7 +9,7 @@ Install:
 Usage:
     from remem import RememClient
 
-    client = RememClient(api_key="remem_live_xxx")
+    client = RememClient(api_key="rm_xxxxxxxxxxxxxx")
 
     # Store a memory
     mem_id = client.remember(
@@ -113,11 +113,11 @@ class SearchResult:
 # ── Exceptions ────────────────────────────────────────────────────
 
 class RememError(Exception):
-    """Base exception for all MemLayer SDK errors."""
+    """Base exception for all Remem SDK errors."""
     def __init__(self, status_code: int, detail: str):
         self.status_code = status_code
         self.detail      = detail
-        super().__init__(f"MemLayer API error {status_code}: {detail}")
+        super().__init__(f"Remem API error {status_code}: {detail}")
 
 
 class AuthenticationError(RememError):
@@ -144,10 +144,10 @@ class DuplicateMemoryError(RememError):
 
 class RememClient:
     """
-    Synchronous MemLayer client.
+    Synchronous Remem client.
 
     Example:
-        client = MemLayerClient(api_key="ml_live_xxx")
+        client = RememClient(api_key="rm_xxxxxxxxxxxxxx")
         mem_id = client.remember("User is in Lagos", user_id="u1", agent_id="bot")
         memories = client.recall("where is the user?", user_id="u1", agent_id="bot")
     """
@@ -155,7 +155,7 @@ class RememClient:
     def __init__(
         self,
         api_key:  str,
-        base_url: str = "https://api.memlayer.online",
+        base_url: str = "https://api.remem.online",
         timeout:  float = 30.0,
     ):
         self.base_url = base_url.rstrip("/")
@@ -490,10 +490,10 @@ class RememClient:
 
 class AsyncRememClient:
     """
-    Async MemLayer client for use with asyncio, LangGraph, and FastAPI.
+    Async Remem client for use with asyncio, LangGraph, and FastAPI.
 
     Example:
-        async with AsyncMemLayerClient(api_key="ml_live_xxx") as client:
+        async with AsyncRememClient(api_key="rm_xxxxxxxxxxxxxx") as client:
             mem_id = await client.remember("user likes dark mode", user_id="u1", agent_id="bot")
             memories = await client.recall("UI preferences", user_id="u1", agent_id="bot")
     """
@@ -501,7 +501,7 @@ class AsyncRememClient:
     def __init__(
         self,
         api_key:  str,
-        base_url: str = "https://memlayer.online",
+        base_url: str = "https://api.remem.online",
         timeout:  float = 30.0,
     ):
         self.base_url = base_url.rstrip("/")

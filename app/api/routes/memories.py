@@ -43,24 +43,36 @@ async def create_memory(
 
 @router.get("/search", response_model=MemorySearchResponse, summary="Search/Query DB for a memory")
 async def search(
-    query:       str            = Query(..., min_length=1),
-    user_id:     str            = Query(...),
-    agent_id:    str            = Query(...),
-    top_k:       int            = Query(default=5, ge=1, le=20),
-    min_score:   float          = Query(default=0.70, ge=0.0, le=1.0),
-    memory_type: Optional[MemoryType]  = Query(default=None),
+    query:             str                  = Query(..., min_length=1),
+    user_id:           str                  = Query(...),
+    agent_id:          str                  = Query(...),
+    top_k:             int                  = Query(default=5, ge=1, le=20),
+    min_score:         float                = Query(default=0.70, ge=0.0, le=1.0),
+    memory_type:       Optional[MemoryType] = Query(default=None),
+    similarity_weight: Optional[float]      = Query(default=None, ge=0.0, le=1.0),
+    recency_weight:    Optional[float]      = Query(default=None, ge=0.0, le=1.0),
+    importance_weight: Optional[float]      = Query(default=None, ge=0.0, le=1.0),
     tenant: dict = Depends(get_current_tenant),
 ):
-    db = get_tenant_client(tenant)
-    return await search_memories(
-        payload=MemorySearch(
+    from pydantic import ValidationError
+    try:
+        payload = MemorySearch(
             query=query,
             user_id=user_id,
             agent_id=agent_id,
             top_k=top_k,
             min_score=min_score,
             memory_type=memory_type,
-        ),
+            similarity_weight=similarity_weight,
+            recency_weight=recency_weight,
+            importance_weight=importance_weight,
+        )
+    except ValidationError as e:
+        raise HTTPException(status_code=422, detail=e.errors())
+
+    db = get_tenant_client(tenant)
+    return await search_memories(
+        payload=payload,
         db=db,
         tenant_id=tenant["tenant_id"],
     )

@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS api_keys (
 );
 
 COMMENT ON TABLE  api_keys          IS 'Hashed API keys — raw key shown once at creation.';
-COMMENT ON COLUMN api_keys.key_hash IS 'SHA-256 hex digest of the raw maas_live_xxx key.';
+COMMENT ON COLUMN api_keys.key_hash IS 'SHA-256 hex digest of the raw rm_xxx key.';
 
 
 -- ------------------------------------------------------------
@@ -337,6 +337,53 @@ CREATE TRIGGER trg_init_memory_count
 
 
 -- ============================================================
+--  STEP 9: MEMORY COUNTS AUTO-UPDATE TRIGGERS
+--  Automatically increments/decrements memory_counts.total
+--  when memories are inserted or deleted.
+-- ============================================================
+
+CREATE OR REPLACE FUNCTION increment_memory_count_on_insert()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO memory_counts (tenant_id, total)
+  VALUES (NEW.tenant_id, 1)
+  ON CONFLICT (tenant_id) DO UPDATE
+  SET total = memory_counts.total + 1;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+COMMENT ON FUNCTION increment_memory_count_on_insert IS
+  'Trigger function: increments memory count when a memory is stored.';
+
+DROP TRIGGER IF EXISTS trg_increment_memory_count ON memories;
+
+CREATE TRIGGER trg_increment_memory_count
+  AFTER INSERT ON memories
+  FOR EACH ROW EXECUTE FUNCTION increment_memory_count_on_insert();
+
+
+CREATE OR REPLACE FUNCTION decrement_memory_count_on_delete()
+RETURNS TRIGGER AS $$
+BEGIN
+  UPDATE memory_counts
+  SET total = GREATEST(0, total - 1)
+  WHERE tenant_id = OLD.tenant_id;
+  RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+
+COMMENT ON FUNCTION decrement_memory_count_on_delete IS
+  'Trigger function: decrements memory count when a memory is deleted/expired.';
+
+DROP TRIGGER IF EXISTS trg_decrement_memory_count ON memories;
+
+CREATE TRIGGER trg_decrement_memory_count
+  AFTER DELETE ON memories
+  FOR EACH ROW EXECUTE FUNCTION decrement_memory_count_on_delete();
+
+
+-- ============================================================
 --  DONE
 -- ============================================================
 -- Tables:     tenants, api_keys, memories, usage_logs, memory_counts
@@ -344,7 +391,11 @@ CREATE TRIGGER trg_init_memory_count
 -- Security:   RLS on all 4 tables
 -- Functions:  match_memories (vector search RPC)
 --             init_tenant_memory_count (trigger function)
+--             increment_memory_count_on_insert (trigger function)
+--             decrement_memory_count_on_delete (trigger function)
 -- Triggers:   trg_init_memory_count (seeds memory_counts on tenant insert)
+--             trg_increment_memory_count (increments memory_counts on insert)
+--             trg_decrement_memory_count (decrements memory_counts on delete)
 -- Cron:       expire-memories (hourly TTL cleanup)
 -- Views:      tenant_usage (plan enforcement)
 -- ============================================================

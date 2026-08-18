@@ -17,14 +17,19 @@ async def create_tenant(
 ):
     db = get_master_client()
 
+    record = {
+        "name":  payload.name,
+        "email": payload.email,
+        "plan":  payload.plan,
+        "mode":  payload.mode,
+    }
+    if payload.mode == "byod":
+        record["byod_supabase_url"] = payload.byod_supabase_url
+        record["byod_supabase_key"] = payload.byod_supabase_key
+
     # Create tenant
     tenant_result = await asyncio.to_thread(
-        lambda: db.table("tenants").insert({
-            "name":  payload.name,
-            "email": payload.email,
-            "plan":  payload.plan,
-            "mode":  payload.mode,
-        }).execute()
+        lambda: db.table("tenants").insert(record).execute()
     )
     if not tenant_result or not getattr(tenant_result, "data", None):
         raise HTTPException(status_code=500, detail="Failed to create tenant record")
