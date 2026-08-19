@@ -5,7 +5,7 @@ long_description = (Path(__file__).parent / "README.md").read_text(encoding="utf
 
 setup(
     name="Remem-py",
-    version="0.1.3",
+    version="0.1.5",
     description="Persistent memory for AI agents — one API key, your agent remembers everything.",
     long_description=long_description,
     long_description_content_type="text/markdown",
