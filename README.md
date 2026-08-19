@@ -62,6 +62,7 @@ client.remember(
     "User prefers short bullet points over long paragraphs",
     user_id="user_123",
     agent_id="support_bot",
+    metadata={"source": "slack", "channel_id": "123"},
 )
 
 # 2. Get context at the start of every session
@@ -103,6 +104,7 @@ result = client.remember(
 
     # Optional
     memory_type="semantic",  # episodic | semantic | summary
+    metadata={"source": "onboarding_form"}, # dictionary for custom data
     importance=0.9,          # 0.0 (low) → 1.0 (high). Default: 0.5
     ttl_days=30,             # auto-delete after 30 days. Default: never
 )
@@ -223,6 +225,7 @@ if memories:
         agent_id="support_bot",
         new_content="User moved from Lagos to Abuja, Nigeria",
         importance=0.95,
+        metadata={"verified": True},
     )
 ```
 
