@@ -38,7 +38,7 @@ class AccountSuspended(HTTPException):
     def __init__(self):
         super().__init__(
             status_code=403,
-            detail="Account suspended. Contact support@yourmaas.com",
+            detail="Account suspended. Contact support@remem.online",
         )
 
 

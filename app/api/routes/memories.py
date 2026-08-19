@@ -8,7 +8,7 @@ from app.schemas.memory import (
     MemoryUpdate, MemoryDelete, MemoryWipe,
     GetContext, MemoryCreateResponse, MemorySearchResponse,
     MemoryListResponse, DeleteResponse, MemoryOut,
-    MemoryType, Is_Duplicate,
+    MemoryType, IsDuplicate,
 )
 from app.services.memory import (
     store_memory, search_memories, list_memories,
@@ -150,7 +150,7 @@ async def check_duplicate(
     db     = get_tenant_client(tenant)
     result = await is_duplicate(
         content=content,
-        payload=Is_Duplicate(user_id=user_id, agent_id=agent_id),
+        payload=IsDuplicate(user_id=user_id, agent_id=agent_id),
         tenant_id=tenant["tenant_id"],
         db=db,
         threshold=threshold,

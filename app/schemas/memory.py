@@ -48,7 +48,7 @@ class GetContext(BaseModel):
     user_id: str
     agent_id: str
  
-class Is_Duplicate(BaseModel):
+class IsDuplicate(BaseModel):
     # embedding: list[float]
     user_id: str
     agent_id: str

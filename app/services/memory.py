@@ -4,12 +4,12 @@ from typing import Any, Optional
 from postgrest.types import CountMethod
 from supabase import Client
 from app.schemas.memory import (
-    Is_Duplicate, MemoryCreate, MemorySearch, MemoryList,
+    IsDuplicate, MemoryCreate, MemorySearch, MemoryList,
     MemoryOut, MemoryCreateResponse, MemorySearchResponse,
     MemoryListResponse, DeleteResponse, MemoryDelete, MemoryWipe,
     GetContext, MemoryUpdate
 )
-from app.services.embeddings import embed_for_search, embed_for_storage
+from app.services.embeddings import embed
 from app.core.config import Settings, get_settings
 import asyncio
 import logging
@@ -145,9 +145,9 @@ async def store_memory(
 
     # # Embed once, use for both storage and duplicate check
     start = perf_counter()
-    embedding = await asyncio.to_thread(embed_for_storage, payload.content)
+    embedding = await asyncio.to_thread(embed, payload.content)
     elapsed = perf_counter() - start
-    logger.debug("embed_for_storage took %.3fs", elapsed)
+    logger.debug("embed took %.3fs", elapsed)
 
     if await _is_duplicate_by_vector(
         payload=payload,
@@ -206,9 +206,9 @@ async def search_memories(
 
     # model = await _get_tenant_model(tenant_id, db)
     start = perf_counter()
-    query_embedding = await asyncio.to_thread(embed_for_search, payload.query)
+    query_embedding = await asyncio.to_thread(embed, payload.query)
     elapsed = perf_counter() - start
-    logger.debug("embed_for_search took %.3fs", elapsed)
+    logger.debug("embed took %.3fs", elapsed)
 
     # pgvector cosine similarity via Supabase RPC
     # We fetch top_k * 3 candidates, re-rank with hybrid scoring, return top_k
@@ -303,7 +303,7 @@ def _recency_score(created_at_str: Optional[str], now: datetime) -> float:
  
 async def is_duplicate(
     content: str,      # ← just take the string directly
-    payload: Is_Duplicate,
+    payload: IsDuplicate,
     tenant_id: str,
     db: Client,
     threshold: float = 0.95,
@@ -313,9 +313,9 @@ async def is_duplicate(
     Use this when calling standalone (not inside store_memory).
     """
     start = perf_counter()
-    embedding = await asyncio.to_thread(embed_for_storage, content)
+    embedding = await asyncio.to_thread(embed, content)
     elapsed = perf_counter() - start
-    logger.debug("embed_for_storage (is_duplicate) took %.3fs", elapsed)
+    logger.debug("embed (is_duplicate) took %.3fs", elapsed)
     return await _is_duplicate_by_vector(
         payload=payload,
         embedding=embedding,
@@ -461,9 +461,9 @@ async def update_memory(
     if payload.new_content is None:
         raise ValueError("new_content cannot be None")
     start = perf_counter()
-    new_embedding = await asyncio.to_thread(embed_for_storage, payload.new_content,)
+    new_embedding = await asyncio.to_thread(embed, payload.new_content)
     elapsed = perf_counter() - start
-    logger.debug("embed_for_storage (update) took %.3fs", elapsed)
+    logger.debug("embed (update) took %.3fs", elapsed)
 
     # Build update payload — only update fields that are provided
     update_payload = {

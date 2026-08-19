@@ -3,19 +3,15 @@ import time
 import logging
 import requests
 
-logger          = logging.getLogger(__name__)
-EMBEDDING_MODEL = "nomic-ai/nomic-embed-text-v1.5"
-DIMENSIONS      = 768   
+logger            = logging.getLogger(__name__)
+EMBEDDING_MODEL   = "nomic-ai/nomic-embed-text-v1.5"
+DIMENSIONS        = 768
 FIREWORKS_API_KEY = os.getenv("FIREWORKS_API_KEY")
-FIREWORKS_URL   = "https://api.fireworks.ai/inference/v1/embeddings"
+FIREWORKS_URL     = "https://api.fireworks.ai/inference/v1/embeddings"
 
-def embed_for_storage(text: str, retries: int = 3, delay: float = 1.5) -> list[float]:
-    return _embed(text, retries, delay)
 
-def embed_for_search(text: str, retries: int = 3, delay: float = 1.5) -> list[float]:
-    return _embed(text, retries, delay)
-
-def _embed(text: str, retries: int, delay: float) -> list[float]:
+def embed(text: str, retries: int = 3, delay: float = 1.5) -> list[float]:
+    """Embed a string using Fireworks AI with automatic retry."""
     last_error = None
 
     for attempt in range(1, retries + 1):
@@ -24,13 +20,10 @@ def _embed(text: str, retries: int, delay: float) -> list[float]:
                 FIREWORKS_URL,
                 headers={
                     "Authorization": f"Bearer {FIREWORKS_API_KEY}",
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
                 },
-                json={
-                    "model": EMBEDDING_MODEL,
-                    "input": text
-                },
-                timeout=10
+                json={"model": EMBEDDING_MODEL, "input": text},
+                timeout=10,
             )
             response.raise_for_status()
             return response.json()["data"][0]["embedding"]
@@ -46,3 +39,8 @@ def _embed(text: str, retries: int, delay: float) -> list[float]:
     raise RuntimeError(
         f"Embedding failed after {retries} attempts: {last_error}"
     )
+
+
+# Backward-compatible aliases
+embed_for_storage = embed
+embed_for_search  = embed

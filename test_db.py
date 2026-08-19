@@ -10,8 +10,8 @@ from app.schemas.memory import (
 from app.services.memory import (
     get_context, is_duplicate, store_memory, search_memories,
     delete_memory, update_memory, wipe_memories, expire_memories,
-    Is_Duplicate
 )
+from app.schemas.memory import IsDuplicate
 
 TENANT_ID = "cde6cfd6-4224-48da-8e5f-abcf25b9a01a"
 USER_ID   = "user_001"
@@ -45,7 +45,7 @@ load_4 = MemoryCreate(
 
 context_payload       = GetContext(user_id=USER_ID,      agent_id=AGENT_ID)
 ghost_context_payload = GetContext(user_id="ghost_user", agent_id=AGENT_ID)
-dup_check_payload = Is_Duplicate(user_id=USER_ID, agent_id=AGENT_ID)
+dup_check_payload = IsDuplicate(user_id=USER_ID, agent_id=AGENT_ID)
 
 search_load_1 = MemorySearch(
     query="Where does this user live?",
@@ -133,7 +133,7 @@ assert dup_check is True, "Expected duplicate to be detected"
 # Should NOT be duplicate — completely different content
 unique_check = asyncio.run(is_duplicate(
     content="User has a dog named Max",
-    payload=Is_Duplicate(user_id=USER_ID, agent_id=AGENT_ID),
+    payload=IsDuplicate(user_id=USER_ID, agent_id=AGENT_ID),
     tenant_id=TENANT_ID,
     db=db,
     threshold=0.95,

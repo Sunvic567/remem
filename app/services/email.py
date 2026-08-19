@@ -4,7 +4,7 @@ import os
 import resend
 
 resend.api_key = os.getenv("RESEND_API_KEY", "")
-FROM_EMAIL = os.getenv("RESEND_FROM_EMAIL", "support@memlayer.online")
+FROM_EMAIL = os.getenv("RESEND_FROM_EMAIL", "support@remem.online")
 
 
 async def send_api_key_email(
@@ -17,12 +17,12 @@ async def send_api_key_email(
     """Send API key to new tenant or upgrade confirmation."""
 
     if is_upgrade:
-        subject = f"Your MemLayer plan has been upgraded to {plan.title()}"
+        subject = f"Your Remem plan has been upgraded to {plan.title()}"
         body    = _upgrade_email(name, plan)
     else:
         if api_key is None:
             raise ValueError("api_key is required when sending a welcome email")
-        subject = "Your MemLayer API Key"
+        subject = "Your Remem API Key"
         body    = _welcome_email(name, api_key, plan)
 
     await asyncio.to_thread(_send_email, email, subject, body)

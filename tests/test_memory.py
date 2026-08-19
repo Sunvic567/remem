@@ -1,8 +1,8 @@
 import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import MagicMock, patch
 from datetime import datetime, timezone
 
-from app.schemas.memory import MemoryCreate, MemorySearch, MemoryList
+from app.schemas.memory import MemoryCreate, MemorySearch, MemoryList, MemoryDelete
 from app.services import memory as svc
 
 
@@ -12,7 +12,7 @@ TENANT_ID = "tenant_test_123"
 USER_ID = "user_abc"
 AGENT_ID = "support_bot"
 
-MOCK_EMBEDDING = [0.1] * 1536
+MOCK_EMBEDDING = [0.1] * 768   # nomic-embed-text-v1.5 produces 768-dim vectors
 
 MOCK_MEMORY_ROW = {
     "id": "mem_001",
@@ -52,7 +52,8 @@ def mock_db():
 
 @pytest.mark.asyncio
 async def test_store_memory_returns_id(mock_db):
-    with patch("app.services.memory.embed", new=AsyncMock(return_value=MOCK_EMBEDDING)):
+    # embed is a sync function called via asyncio.to_thread — use MagicMock, not AsyncMock
+    with patch("app.services.memory.embed", new=MagicMock(return_value=MOCK_EMBEDDING)):
         payload = MemoryCreate(
             content="User is from Lagos",
             user_id=USER_ID,
@@ -65,7 +66,7 @@ async def test_store_memory_returns_id(mock_db):
 
 @pytest.mark.asyncio
 async def test_store_memory_with_ttl(mock_db):
-    with patch("app.services.memory.embed", new=AsyncMock(return_value=MOCK_EMBEDDING)):
+    with patch("app.services.memory.embed", new=MagicMock(return_value=MOCK_EMBEDDING)):
         payload = MemoryCreate(
             content="Temporary session context",
             user_id=USER_ID,
@@ -84,7 +85,7 @@ async def test_store_memory_with_ttl(mock_db):
 
 @pytest.mark.asyncio
 async def test_search_returns_scored_results(mock_db):
-    with patch("app.services.memory.embed", new=AsyncMock(return_value=MOCK_EMBEDDING)):
+    with patch("app.services.memory.embed", new=MagicMock(return_value=MOCK_EMBEDDING)):
         payload = MemorySearch(
             query="How does this user like to communicate?",
             user_id=USER_ID,
@@ -105,7 +106,7 @@ async def test_search_filters_by_min_score(mock_db):
     low_sim_row = {**MOCK_MEMORY_ROW, "similarity": 0.3}
     mock_db.rpc.return_value.execute.return_value.data = [low_sim_row]
 
-    with patch("app.services.memory.embed", new=AsyncMock(return_value=MOCK_EMBEDDING)):
+    with patch("app.services.memory.embed", new=MagicMock(return_value=MOCK_EMBEDDING)):
         payload = MemorySearch(
             query="something",
             user_id=USER_ID,
@@ -143,9 +144,11 @@ def test_recency_score_invalid_date():
 @pytest.mark.asyncio
 async def test_delete_memory(mock_db):
     result = await svc.delete_memory(
-        memory_id="mem_001",
-        user_id=USER_ID,
-        agent_id=AGENT_ID,
+        payload=MemoryDelete(
+            memory_id="mem_001",
+            user_id=USER_ID,
+            agent_id=AGENT_ID,
+        ),
         db=mock_db,
         tenant_id=TENANT_ID,
     )
