@@ -21,13 +21,14 @@ pip install Remem-py
 ```python
 from remem import RememClient
 
-client = RememClient(api_key="remem_live_xxx")
+client = RememClient(api_key="rm_xxxxx")
 
 # Store a memory
 result = client.remember(
     "User prefers dark mode",
     user_id="user_123",
     agent_id="support_bot",
+    metadata={"theme_preference": "dark"},
 )
 print(result.id)
 
@@ -51,11 +52,12 @@ Use `AsyncRememClient` for async apps and frameworks like FastAPI or LangGraph:
 ```python
 from remem import AsyncRememClient
 
-async with AsyncRememClient(api_key="remem_live_xxx") as client:
+async with AsyncRememClient(api_key="rm_xxxxx") as client:
     await client.remember(
         "User prefers concise responses",
         user_id="user_123",
         agent_id="support_bot",
+        metadata={"response_style": "concise"},
     )
 
     memories = await client.recall(
@@ -80,13 +82,54 @@ async with AsyncRememClient(api_key="remem_live_xxx") as client:
 | `forget_all(...)` | Wipe all memories for a user+agent pair |
 | `is_duplicate(...)` | Check whether a memory already exists before storing |
 
+### `list()` — Paginate stored memories
+```python
+memories_page = client.list(
+    user_id="user_123",
+    agent_id="support_bot",
+    limit=20,
+    offset=0,
+)
+```
+
+### `update()` — Update an existing memory
+```python
+client.update(
+    memory_id="123e4567-e89b-12d3-a456-426614174000",
+    user_id="user_123",
+    agent_id="support_bot",
+    new_content="User moved from Lagos to Abuja",
+    importance=0.9,
+    metadata={"verified": True},
+)
+```
+
+### `forget()` and `forget_all()` — Deletion
+```python
+# Delete a single memory
+client.forget(memory_id="...", user_id="user_123", agent_id="support_bot")
+
+# Wipe all memories for a user+agent
+client.forget_all(user_id="user_123", agent_id="support_bot")
+```
+
+### `is_duplicate()` — Check for duplicates
+```python
+is_dup = client.is_duplicate(
+    content="User prefers dark mode",
+    user_id="user_123",
+    agent_id="support_bot",
+    threshold=0.95,
+)
+```
+
 ---
 
 ## Configuration
 
 ```python
 client = RememClient(
-    api_key="remem_live_xxx",   # required
+    api_key="rm_xxxxx",   # required
     base_url="https://api.remem.online",  # default
     timeout=30.0,               # seconds
 )
@@ -106,13 +149,14 @@ from remem import (
     RememError,
 )
 
-client = RememClient(api_key="remem_live_xxx")
+client = RememClient(api_key="rm_xxxxx")
 
 try:
     result = client.remember(
         "User prefers dark mode",
         user_id="user_123",
         agent_id="support_bot",
+        metadata={"theme": "dark"},
     )
 
 except AuthenticationError:
@@ -137,11 +181,11 @@ except RememError as e:
 
 ```python
 # Sync
-with RememClient(api_key="remem_live_xxx") as client:
+with RememClient(api_key="rm_xxxxx") as client:
     client.remember("User is in Lagos", user_id="u1", agent_id="bot")
 
 # Async
-async with AsyncRememClient(api_key="remem_live_xxx") as client:
+async with AsyncRememClient(api_key="rm_xxxxx") as client:
     await client.remember("User is in Lagos", user_id="u1", agent_id="bot")
 ```
 
@@ -153,7 +197,7 @@ async with AsyncRememClient(api_key="remem_live_xxx") as client:
 from langgraph.graph import StateGraph, MessagesState
 from remem import AsyncRememClient
 
-remem = AsyncRememClient(api_key="remem_live_xxx")
+remem = AsyncRememClient(api_key="rm_xxxxx")
 
 
 async def load_memory(state: MessagesState):
@@ -215,17 +259,17 @@ Every method maps to a REST endpoint:
 ```bash
 # Store
 curl -X POST https://api.remem.online/memories \
-  -H "X-API-Key: remem_live_xxx" \
+  -H "X-API-Key: rm_xxxxx" \
   -H "Content-Type: application/json" \
   -d '{"content": "User prefers dark mode", "user_id": "u1", "agent_id": "bot"}'
 
 # Search
 curl "https://api.remem.online/memories/search?query=preferences&user_id=u1&agent_id=bot" \
-  -H "X-API-Key: remem_live_xxx"
+  -H "X-API-Key: rm_xxxxx"
 
 # Context
 curl "https://api.remem.online/memories/context?user_id=u1&agent_id=bot" \
-  -H "X-API-Key: remem_live_xxx"
+  -H "X-API-Key: rm_xxxxx"
 ```
 
 Full API reference at [remem.online/docs](https://remem.online/docs).
@@ -245,7 +289,7 @@ Full API reference at [remem.online/docs](https://remem.online/docs).
 ## Package Info
 
 - **Package**: `Remem-py`
-- **Version**: `0.1.4`
+- **Version**: `0.1.5`
 - **Import**: `from remem import RememClient`
 
 ---

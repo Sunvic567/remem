@@ -584,6 +584,7 @@ def _row_to_memory_out(row: dict) -> MemoryOut:
         metadata=row.get("metadata") or {},
         importance=row.get("importance", 0.5),
         score=row.get("score"),
+        score_detail=row.get("score_detail"),
         created_at=row["created_at"],
         last_accessed=row.get("last_accessed"),
         expires_at=row.get("expires_at"),

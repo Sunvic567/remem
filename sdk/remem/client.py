@@ -9,7 +9,7 @@ Install:
 Usage:
     from remem import RememClient
 
-    client = RememClient(api_key="remem_live_xxx")
+    client = RememClient(api_key="rm_xxxxx")
 
     # Store a memory
     mem_id = client.remember(
@@ -147,7 +147,7 @@ class RememClient:
     Synchronous Remem client.
 
     Example:
-        client = RememClient(api_key="rm_live_xxx")
+        client = RememClient(api_key="rm_xxxxx")
         mem_id = client.remember("User is in Lagos", user_id="u1", agent_id="bot")
         memories = client.recall("where is the user?", user_id="u1", agent_id="bot")
     """
@@ -493,7 +493,7 @@ class AsyncRememClient:
     Async Remem client for use with asyncio, LangGraph, and FastAPI.
 
     Example:
-        async with AsyncRememClient(api_key="rm_live_xxx") as client:
+        async with AsyncRememClient(api_key="rm_xxxxx") as client:
             mem_id = await client.remember("user likes dark mode", user_id="u1", agent_id="bot")
             memories = await client.recall("UI preferences", user_id="u1", agent_id="bot")
     """

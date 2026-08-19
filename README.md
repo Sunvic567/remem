@@ -84,9 +84,9 @@ for m in memories:
 
 ## Get an API Key
 
-1. Go to [remem.online](https://remem.online)
+1. Go to [dev.remem.online](https://dev.remem.online)
 2. Sign up — free, no credit card
-3. Check your email for your key (`rm_live_xxx`)
+3. Check your email for your key (`rm_xxx`)
 
 Free plan: 500 memories, 100 requests/day. Enough to build and test your agent fully.
 
@@ -177,6 +177,25 @@ Never ask for information you already know."""
 
 Without `current_message` — returns memories sorted by importance and recency.
 With `current_message` — uses semantic search to return the most relevant memories for what the user is about to ask.
+
+---
+
+### `list()` — Paginate stored memories
+
+```python
+# Fetch memories page by page
+memories_page = client.list(
+    user_id="user_123",
+    agent_id="support_bot",
+    limit=20,     # max 100
+    offset=0,
+)
+
+for m in memories_page.memories:
+    print(m.content)
+
+print(f"Total memories stored: {memories_page.total}")
+```
 
 ---
 
@@ -385,13 +404,11 @@ curl -X POST https://api.remem.online/memories \
   -d '{"content": "User prefers dark mode", "user_id": "u1", "agent_id": "bot"}'
 
 # Search
-curl "https://api.remem.online/memories/search\
-?query=ui+preferences&user_id=u1&agent_id=bot&min_score=0.0" \
+curl "https://api.remem.online/memories/search?query=ui+preferences&user_id=u1&agent_id=bot&min_score=0.0" \
   -H "X-API-Key: rm_live_xxx"
 
 # Context
-curl "https://api.remem.online/memories/context\
-?user_id=u1&agent_id=bot" \
+curl "https://api.remem.online/memories/context?user_id=u1&agent_id=bot" \
   -H "X-API-Key: rm_live_xxx"
 ```
 
