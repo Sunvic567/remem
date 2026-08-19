@@ -53,7 +53,7 @@ pip install remem-py
 from remem import RememClient
 
 client = RememClient(
-    api_key="rm_live_xxx",
+    api_key="rm_xxxxx",
     base_url="https://api.remem.online",
 )
 
@@ -109,8 +109,7 @@ result = client.remember(
     ttl_days=30,             # auto-delete after 30 days. Default: never
 )
 
-print(result.id)              # UUID of the stored memory
-print(result.is_duplicate)    # True if this memory already exists
+print(result.id)    # UUID of the stored memory
 ```
 
 **When to use each memory type:**
@@ -260,7 +259,7 @@ For LangGraph, FastAPI, and any async application:
 from remem import AsyncRememClient
 
 async def main():
-    async with AsyncRememClient(api_key="rm_live_xxx") as client:
+    async with AsyncRememClient(api_key="rm_xxxxx") as client:
 
         await client.remember(
             "User prefers dark mode",
@@ -358,7 +357,7 @@ from remem import (
     RememError,            # base — catches everything else
 )
 
-client = RememClient(api_key="rm_live_xxx")
+client = RememClient(api_key="rm_xxxxx")
 
 try:
     client.remember("User is in Lagos", user_id="u1", agent_id="bot")
@@ -382,11 +381,11 @@ except RememError as e:
 
 ```python
 # Sync
-with RememClient(api_key="rm_live_xxx") as client:
+with RememClient(api_key="rm_xxxxx") as client:
     client.remember("something", user_id="u1", agent_id="bot")
 
 # Async
-async with AsyncRememClient(api_key="rm_live_xxx") as client:
+async with AsyncRememClient(api_key="rm_xxxxx") as client:
     await client.remember("something", user_id="u1", agent_id="bot")
 ```
 
@@ -399,17 +398,35 @@ Don't want the SDK? Every method maps to a direct HTTP call:
 ```bash
 # Store
 curl -X POST https://api.remem.online/memories \
-  -H "X-API-Key: rm_live_xxx" \
+  -H "X-API-Key: rm_xxxxx" \
   -H "Content-Type: application/json" \
   -d '{"content": "User prefers dark mode", "user_id": "u1", "agent_id": "bot"}'
 
 # Search
 curl "https://api.remem.online/memories/search?query=ui+preferences&user_id=u1&agent_id=bot&min_score=0.0" \
-  -H "X-API-Key: rm_live_xxx"
+  -H "X-API-Key: rm_xxxxx"
 
 # Context
 curl "https://api.remem.online/memories/context?user_id=u1&agent_id=bot" \
-  -H "X-API-Key: rm_live_xxx"
+  -H "X-API-Key: rm_xxxxx"
+
+# List (paginate)
+curl "https://api.remem.online/memories?user_id=u1&agent_id=bot&limit=20&offset=0" \
+  -H "X-API-Key: rm_xxxxx"
+
+# Update
+curl -X PATCH https://api.remem.online/memories/{memory_id} \
+  -H "X-API-Key: rm_xxxxx" \
+  -H "Content-Type: application/json" \
+  -d '{"user_id": "u1", "agent_id": "bot", "new_content": "User moved to Abuja"}'
+
+# Delete one
+curl -X DELETE "https://api.remem.online/memories/{memory_id}?user_id=u1&agent_id=bot" \
+  -H "X-API-Key: rm_xxxxx"
+
+# Wipe all
+curl -X DELETE "https://api.remem.online/memories?user_id=u1&agent_id=bot&confirm=true" \
+  -H "X-API-Key: rm_xxxxx"
 ```
 
 Full reference at [docs.remem.online](https://docs.remem.online).

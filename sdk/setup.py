@@ -5,7 +5,7 @@ long_description = (Path(__file__).parent / "README.md").read_text(encoding="utf
 
 setup(
     name="Remem-py",
-    version="0.1.5",
+    version="0.1.6",
     description="Persistent memory for AI agents — one API key, your agent remembers everything.",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -13,9 +13,9 @@ setup(
     author_email="sunvictor567@gmail.com",
     url="https://github.com/sunvic567/remem",
     project_urls={
-        "Documentation": "https://remem.online/docs",
+        "Documentation": "https://docs.remem.online",
         "Bug Tracker":   "https://github.com/sunvic567/remem/issues",
-        "Homepage":      "https://remem.online",
+        "Homepage":      "https://dev.remem.online",
     },
     license="MIT",
     packages=find_packages(),    # ← removed where="sdk"

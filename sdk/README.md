@@ -270,9 +270,31 @@ curl "https://api.remem.online/memories/search?query=preferences&user_id=u1&agen
 # Context
 curl "https://api.remem.online/memories/context?user_id=u1&agent_id=bot" \
   -H "X-API-Key: rm_xxxxx"
+
+# List (paginate)
+curl "https://api.remem.online/memories?user_id=u1&agent_id=bot&limit=20&offset=0" \
+  -H "X-API-Key: rm_xxxxx"
+
+# Update
+curl -X PATCH https://api.remem.online/memories/{memory_id} \
+  -H "X-API-Key: rm_xxxxx" \
+  -H "Content-Type: application/json" \
+  -d '{"user_id": "u1", "agent_id": "bot", "new_content": "User moved to Abuja"}'
+
+# Delete one
+curl -X DELETE "https://api.remem.online/memories/{memory_id}?user_id=u1&agent_id=bot" \
+  -H "X-API-Key: rm_xxxxx"
+
+# Wipe all
+curl -X DELETE "https://api.remem.online/memories?user_id=u1&agent_id=bot&confirm=true" \
+  -H "X-API-Key: rm_xxxxx"
+
+# Duplicate check
+curl "https://api.remem.online/memories/duplicate-check?content=User+prefers+dark+mode&user_id=u1&agent_id=bot" \
+  -H "X-API-Key: rm_xxxxx"
 ```
 
-Full API reference at [remem.online/docs](https://remem.online/docs).
+Full API reference at [docs.remem.online](https://docs.remem.online).
 
 ---
 
